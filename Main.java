@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class CSA_Assignment2 {
+public class Main {
     public static void main(String[] args) {
         System.out.println("<-------第一题------->");
         Book book = new Book("Java Programming", "John Smith", 2022);
@@ -36,12 +36,12 @@ public class CSA_Assignment2 {
         Calculator.subtract(4, 2);
         Calculator.multiply(2, 5);
         Calculator.divide(5, 2);
-        Scanner sc=new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
         System.out.println("请输入超大数1：");
-        String a=sc.nextLine();
+        String a = sc.nextLine();
         System.out.println("请输入超大数2:");
-        String b=sc.nextLine();
-        System.out.println(getSum(a,b));
+        String b = sc.nextLine();
+        System.out.println(getSum(a, b));
 
         System.out.println("<-------第四题------->");
         String[] s1 = {"flower", "flow", "flight"};
@@ -53,14 +53,14 @@ public class CSA_Assignment2 {
 
         System.out.println("<-------第五题------->");
         System.out.println("请输入height数组的大小n=");
-        int n=sc.nextInt();
-        int[] height=new int[n];
+        int n = sc.nextInt();
+        int[] height = new int[n];
         System.out.println("请输入height数组：");
-        for(int i=0;i<n;i++){
-            height[i]=sc.nextInt();
-            if(height[i]<0) {
+        for (int i = 0; i < n; i++) {
+            height[i] = sc.nextInt();
+            if (height[i] < 0) {
                 System.out.println("输入错误！！！");
-                return ;
+                return;
             }
         }
         System.out.println(trap(height));
@@ -71,38 +71,22 @@ public class CSA_Assignment2 {
         List<Integer> la = new ArrayList<>();
         List<Integer> lb = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        int flag = 0, i;
-        for (i = a.length() - 1; i >= 0; --i) la.add(a.charAt(i) - '0');
-        for (i = b.length() - 1; i >= 0; --i) lb.add(b.charAt(i) - '0');
-        for (i = 0; i < a.length() && i < b.length(); i++) {
-            int temp = la.get(i) + lb.get(i) + flag;
+        int temp = 0;
+        int maxlength = Math.max(a.length(), b.length());
+        for (int i = a.length() - 1; i >= 0; --i) la.add(a.charAt(i) - '0');
+        for (int i = b.length() - 1; i >= 0; --i) lb.add(b.charAt(i) - '0');
+        for (int i = 0; i < maxlength; i++) {
+            if (i < la.size()) temp += la.get(i);
+            if (i < lb.size()) temp += lb.get(i);
             sb.append(temp % 10);
-            if (temp >= 10) flag = 1;
-            else flag = 0;
+            temp /= 10;
         }
-        if (flag == 1) {
-            if (a.length() == b.length()) sb.append(1);
-            else if (i == a.length())
-                for (; i < b.length(); i++) {
-                    int temp = lb.get(i) + 1;
-                    sb.append(temp % 10);
-                    if (temp < 10) break;
-                }
-            else
-                for (; i < a.length(); i++) {
-                    int temp = la.get(i) + 1;
-                    sb.append(temp % 10);
-                    if (temp < 10) break;
-                }
-            i++;
-        }
-        if (flag==1) sb.append(1);
-        else if (i < a.length()) for (; i < a.length(); i++) sb.append(la.get(i));
-        else for (; i < b.length(); i++) sb.append(lb.get(i));
+        if (temp == 1) sb.append(1);
         return sb.reverse().toString();
     }
 
     public static String longestCommonPrefix(String[] ss) {
+        if (ss == null || ss.length == 0) return "";
         int minLength = ss[0].length();
         for (int i = 1; i < ss.length; i++)
             if (minLength > ss[i].length()) minLength = ss[i].length();
@@ -120,25 +104,39 @@ public class CSA_Assignment2 {
         else return ss[0].substring(0, i);
     }
 
-    public static int trap(int[] h){
-        int count=0,l=0;
-        int r=findRight(h,l);
-        while(r!=-1&&r<h.length)
-            if(r==0) r=findRight(h,++l);
-            else{
-                int sum=0;
-                for(int i=l+1;i<r;i++) sum+=h[i];
-                count+=(r-l-1)*h[l]-sum;
-                r=findRight(h,l=r);
+    public static int trap(int[] h) {
+        int count = 0;
+        int l = findLeft(h, 0);
+        int r = findRight(h, l);
+        while (r != -1 && r < h.length)
+            if (r == 0) r = findRight(h, ++l);
+            else {
+                int sum = 0;
+                for (int i = l + 1; i < r; i++) sum += h[i];
+                count += (r - l - 1) * Math.min(h[l], h[r]) - sum;
+                l = findLeft(h, r);
+                r = findRight(h, l);
             }
         return count;
     }
 
-    public static int findRight(int[] h,int l){
-        if(l==h.length-1) return -1;
-        for(int i=l+1;i<h.length;i++) if(h[i]>=h[l]) return i;
-        for(int i=l+1;i<h.length-1;i++) if(h[i]<h[i+1]) return 0;
+    public static int findLeft(int[] h, int l) {
+        while (l < h.length - 2 && h[l] <= h[l + 1]) l++;
+        return l;
+    }
+
+    public static int findRight(int[] h, int l) {
+        for (int i = l + 2; i < h.length; i++) if (h[i] >= h[l]) return i;
+        int temp = -1;
+        for (int i = l + 2; i < h.length; i++) if (check(h, l + 1, i)) temp = i;
+        if (temp != -1) return temp;
+        for (int i = l + 1; i < h.length - 1; i++) if (h[i] < h[i + 1]) return 0;
         return -1;
+    }
+
+    public static boolean check(int[] h, int l, int r) {
+        for (int i = l; i < r; i++) if (h[i] >= h[r]) return false;
+        return true;
     }
 
     public static class Book {
