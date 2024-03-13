@@ -1,0 +1,23 @@
+create database if not exists CSA_Assignment5;
+use CSA_Assignment5;
+create table student
+(
+    SNO     varchar(20),
+    Name    varchar(10),
+    Age     integer,
+    College varchar(30)
+);
+#1
+insert into student value
+    ('s001', '老大', 20, '计算机学院'),
+    ('s002', '老二', 19, '计算机学院'),
+    ('s003', '老三', 18, '计算机学院'),
+    ('s004', '老四', 17, '计算机学院');
+#2
+select * from student;
+#3
+delete from student where SNO='s004';
+#4
+select * from student where sno='s003';
+#5
+update student set college='通信学院' where sno='s001';
